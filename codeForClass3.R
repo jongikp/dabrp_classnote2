@@ -45,16 +45,19 @@ dbGetQuery(con, "select type, count(*) from planes group by type order by count(
 
 # where
 dbGetQuery(con, "select * from flights where month = 1")
+# 1월달인 것만 가져와
 
 # and
 dbGetQuery(con, "select * from flights where month = 12 and day = 25")
+# 교집합 12월 25일
 
 # or
 dbGetQuery(con, "select * from flights where arr_delay > 120 or dep_delay > 120")
+# 합집합 
 
 # inner join
 dbGetQuery(con, "select * from flights as a inner join planes as b on a.tailnum = b.tailnum")
-
+# as는 컬럼명을 대체하는 명령어
 
 library(tidyverse)
 
@@ -65,15 +68,20 @@ flights
 filter(flights, month == 1, day == 1)
 jan1 <- filter(flights, month == 1, day == 1)
 (dec25 <- filter(flights, month == 12, day == 25))
+# , filter에서 and와 같다.
 
 filter(flights, month == 11 | month == 12)
+# |는 filter에서 or와 같다.
 nov_dec <- filter(flights, month %in% c(11, 12))
 filter(flights, !(arr_delay > 120 | dep_delay > 120))
+# !는 부정의 의미 반대 결과물을 주세요
 filter(flights, arr_delay <= 120, dep_delay <= 120)
+# 76번과 78번 같음
 
 # arrange like order by
 arrange(flights, year, month, day)
 arrange(flights, desc(arr_delay))
+#desc -> 내림차순
 
 # test NA|
 df <- tibble(x = c(5, 2, NA))
@@ -83,10 +91,14 @@ arrange(df, desc(x))
 # select like select
 select(flights, year, month, day)
 select(flights, year:day)
+# :는 year에서 day 컬럼까지
 select(flights, -(year:day))
+# -는 그 컬럼 빼고 나머지
 
 rename(flights, tail_num = tailnum)
+#rename 컬럼명 변경
 select(flights, time_hour, air_time, everything())
+
 
 # ends_with with select
 flights_sml <- select(flights, 
@@ -114,12 +126,15 @@ transmute(flights,
           hours = air_time / 60,
           gain_per_hour = gain / hours
 )
+# 계산한 컬럼들만 남기고 나타냄
 
 # extra functions
 
 (x <- 1:10)
 lag(x)
+# 앞에 한칸 밀기
 lead(x)
+#뒤에 한칸 당기기
 
 # summarise what you want to get
 summarise(flights, delay = mean(dep_delay, na.rm = TRUE))
@@ -134,7 +149,7 @@ daily <- group_by(flights, year, month, day)
 (per_month <- summarise(per_day, flights = sum(flights)))
 (per_year  <- summarise(per_month, flights = sum(flights)))
 
-# ungroup
+# ungroup 그룹의 조건을 해제
 daily %>% 
   ungroup() %>% 
   summarise(flights = n())
@@ -143,6 +158,14 @@ daily %>%
 flights_sml %>% 
   group_by(year, month, day) %>%
   filter(rank(desc(arr_delay)) < 10)
+
+summarise(group_by(flights,year,month,day),
+          delay = mean(dep_delay,na.rm=TRUE))
+
+flights %>% 
+  group_by(year, month, day) %>%
+  summarise(delay=mean(dep_delay,na.rm=TRUE))
+
 
 # assign values
 popular_dests <- flights %>% 
@@ -262,9 +285,13 @@ library(data.table)
 # download.file(url,destfile = "./data/flights14.csv")
 
 # read data
+
 system.time(flights <- read.csv("./data/flights14.csv"))
+# read.csv
 system.time(flights <- read_csv("./data/flights14.csv"))
+# read_csv
 system.time(flights <- fread("./data/flights14.csv"))
+# fread : 얘가 제일 빠름
 flights
 dim(flights)
 
@@ -287,7 +314,7 @@ head(ans)
 ans <- flights[, .(arr_delay, dep_delay)]
 head(ans)
 
-# rename
+# rename 이름 바꾸기도 편함
 ans <- flights[, .(delay_arr = arr_delay, delay_dep = dep_delay)]
 head(ans)
 
@@ -309,4 +336,3 @@ flights[carrier == "AA", .N, by = .(origin,dest)]
 
 # add options
 flights[carrier == "AA", .N, by = .(origin, dest)][order(origin, -dest)][1:10,]
-
