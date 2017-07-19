@@ -5,7 +5,7 @@ library(data.table)
 
 ## 과제 1 데이터 준비
 
-item<-fread("chrispark/dabrp_classnote2/recomen/item.csv", encoding = "UTF-8")
+item<-fread("./recomen/item.csv", encoding = "UTF-8")
 
 ## 과제 1.1
 
@@ -49,7 +49,7 @@ item[grep("(/.*?){2,}",cate_3_name),]
 
 ## 과제 2 데이터 준비
 
-elev<-fread("chrispark/dabrp_classnote2/data/elevatorkr16.csv", encoding = "UTF-8")
+elev<-fread("./data/elevatorkr16.csv", encoding = "UTF-8")
 elev
 
 ## 과제 2.1
