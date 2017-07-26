@@ -132,4 +132,23 @@ gap_fcon <- fcon_2 + geom_line() + geom_point()
 gap_fcon
 
 
+# 지도 만들기
+
+if (!require("ggmap")) {devtools::install_github("dkahle/ggmap")}
+install.packages("dplyr")
+library(dplyr)
+library(ggmap)
+
+## 실습3
+
+loc <- "서울"
+loc
+
+wifi <- read.csv("./data/wifi.csv", encoding = "UTF-8")
+wifi
+summary(wifi)
+
+mapse<-get_googlemap(loc, zoom = 11) %>% ggmap()
+mapse + geom_point(wifi, aes(x=,y=, color=))
+
 
